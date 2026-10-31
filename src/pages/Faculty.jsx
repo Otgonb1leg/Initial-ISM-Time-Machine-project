@@ -1,0 +1,11 @@
+import { useMemo, useState } from 'react'
+import { Search, SlidersHorizontal } from 'lucide-react'
+import TeacherCard from '../components/TeacherCard'
+export default function Faculty({ teachers }) {
+ const [query,setQuery]=useState(''); const [course,setCourse]=useState('all')
+ const courses=[...new Set(teachers.flatMap(t=>t.courses||[]))].sort()
+ const filtered=useMemo(()=>teachers.filter(t=>`${t.full_name} ${t.position} ${t.degree} ${(t.research||[]).join(' ')} ${(t.courses||[]).join(' ')}`.toLowerCase().includes(query.toLowerCase()) && (course==='all'||(t.courses||[]).includes(course))),[teachers,query,course])
+ return <section className="container-shell py-16 sm:py-24"><p className="eyebrow">DIRECTORY / FACULTY</p><div className="mt-5 flex flex-col justify-between gap-6 md:flex-row md:items-end"><div><h1 className="page-title">Багш нар</h1><p className="mt-4 max-w-xl text-sm leading-7 text-muted">Тэнхимийн эрдэмтэн багш нарын академик профайл, сургалт, судалгааны мэдээлэл.</p></div><p className="font-display text-4xl">{teachers.length.toString().padStart(2,'0')} <span className="font-sans text-xs text-muted">PROFILES</span></p></div>
+ <div className="mt-12 flex flex-col gap-3 border-y border-line py-5 sm:flex-row"><label className="flex flex-1 items-center gap-3 border border-line bg-white px-4 py-3"><Search size={17} className="text-muted"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Нэр, хичээл, судалгаагаар хайх..." className="w-full bg-transparent text-sm outline-none"/></label><label className="flex items-center gap-3 border border-line bg-white px-4 py-3"><SlidersHorizontal size={16} className="text-muted"/><select value={course} onChange={e=>setCourse(e.target.value)} className="min-w-44 bg-transparent text-sm outline-none"><option value="all">Бүх хичээл</option>{courses.map(c=><option key={c}>{c}</option>)}</select></label></div>
+ <p className="my-6 text-xs text-muted">{filtered.length} үр дүн</p><div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">{filtered.map(t=><TeacherCard key={t.id} teacher={t}/>)}</div>{filtered.length===0&&<div className="border border-dashed border-line py-20 text-center text-sm text-muted">Тохирох багш олдсонгүй. Хайлтын утгаа өөрчилнө үү.</div>}</section>
+}
